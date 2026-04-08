@@ -1,7 +1,6 @@
 /*
- * WelcomeScreen — Tela de boas-vindas do Quiz Voepet
- * Design: Consultório Acolhedor — sage green, terracotta, sand
- * Hero com imagem de fundo, CTA forte
+ * WelcomeScreen — Tela de boas-vindas mesclada (Voepet + CoreStudio)
+ * Hero com imagem + stats cards + CTA forte + linguagem de diagnóstico
  */
 
 import { motion } from 'framer-motion';
@@ -21,7 +20,7 @@ export default function WelcomeScreen({ onStart }: WelcomeScreenProps) {
           alt="Pet acolhido"
           className="w-full h-full object-cover"
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/30 to-black/60" />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/55 via-black/35 to-black/65" />
       </div>
 
       {/* Content */}
@@ -46,8 +45,9 @@ export default function WelcomeScreen({ onStart }: WelcomeScreenProps) {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.2 }}
           >
-            <span className="inline-block px-4 py-1.5 rounded-full bg-white/15 backdrop-blur-sm text-white/90 text-sm font-medium mb-6 border border-white/20">
-              Quiz Gratuito
+            <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/15 backdrop-blur-sm text-white/90 text-sm font-medium mb-6 border border-white/20">
+              <span className="text-base">🎯</span>
+              Diagnóstico Gratuito
             </span>
 
             <h1
@@ -60,43 +60,58 @@ export default function WelcomeScreen({ onStart }: WelcomeScreenProps) {
             </h1>
 
             <p className="text-white/85 text-lg sm:text-xl leading-relaxed mb-8 max-w-lg">
-              Responda 7 perguntas rápidas e receba uma recomendação
-              personalizada da{' '}
-              <strong className="text-white">Dra. Wendi</strong>, veterinária há
-              mais de 20 anos.
+              Este diagnóstico rápido vai revelar a maior necessidade do seu pet e qual o próximo passo para cuidar dele com mais segurança. Feito pela{' '}
+              <strong className="text-white">Dra. Wendi</strong>, veterinária há mais de 20 anos.
             </p>
           </motion.div>
 
+          {/* Stats cards — inspirado no CoreStudio */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.5 }}
-            className="flex flex-col sm:flex-row gap-4 items-start"
+            transition={{ duration: 0.6, delay: 0.4 }}
+            className="flex gap-3 mb-8"
+          >
+            {[
+              { value: '8', label: 'perguntas\nrápidas' },
+              { value: '~2 min', label: 'tempo\nestimado' },
+              { value: '100%', label: 'gratuito\ne sigiloso' },
+            ].map((stat, i) => (
+              <div
+                key={i}
+                className="flex-1 bg-white/10 backdrop-blur-sm border border-white/15 rounded-2xl px-3 py-3.5 text-center"
+              >
+                <p
+                  className="text-white text-xl sm:text-2xl font-bold mb-0.5"
+                  style={{ fontFamily: "'DM Serif Display', Georgia, serif" }}
+                >
+                  {stat.value}
+                </p>
+                <p className="text-white/65 text-xs leading-tight whitespace-pre-line">
+                  {stat.label}
+                </p>
+              </div>
+            ))}
+          </motion.div>
+
+          {/* CTA */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.55 }}
+            className="flex flex-col items-start"
           >
             <button
               onClick={onStart}
-              className="group flex items-center gap-3 px-8 py-4 rounded-2xl bg-terracotta text-white font-semibold text-lg shadow-lg shadow-terracotta/30 hover:shadow-xl hover:shadow-terracotta/40 transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]"
+              className="group flex items-center justify-center gap-3 w-full sm:w-auto px-10 py-4.5 rounded-2xl bg-terracotta text-white font-semibold text-lg shadow-lg shadow-terracotta/30 hover:shadow-xl hover:shadow-terracotta/40 transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] uppercase tracking-wide"
             >
-              Começar o Quiz
+              Desbloquear Meu Diagnóstico
               <ArrowRight className="w-5 h-5 transition-transform group-hover:translate-x-1" />
             </button>
 
-            <div className="flex items-center gap-2 text-white/70 text-sm mt-2 sm:mt-3">
-              <svg
-                className="w-4 h-4"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-                />
-              </svg>
-              Leva menos de 2 minutos
-            </div>
+            <p className="text-white/55 text-sm mt-3 text-center w-full sm:w-auto sm:text-left">
+              8 perguntas · Resultado imediato
+            </p>
           </motion.div>
         </div>
 
@@ -108,36 +123,18 @@ export default function WelcomeScreen({ onStart }: WelcomeScreenProps) {
           className="px-6 pb-6"
         >
           <div className="flex flex-wrap items-center gap-6 text-white/60 text-sm">
-            <div className="flex items-center gap-2">
-              <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                <path
-                  fillRule="evenodd"
-                  d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                  clipRule="evenodd"
-                />
-              </svg>
-              100% gratuito
-            </div>
-            <div className="flex items-center gap-2">
-              <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                <path
-                  fillRule="evenodd"
-                  d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                  clipRule="evenodd"
-                />
-              </svg>
-              Resultado personalizado
-            </div>
-            <div className="flex items-center gap-2">
-              <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                <path
-                  fillRule="evenodd"
-                  d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                  clipRule="evenodd"
-                />
-              </svg>
-              Feito por veterinária
-            </div>
+            {['100% gratuito', 'Resultado personalizado', 'Feito por veterinária', 'Dados seguros'].map((text, i) => (
+              <div key={i} className="flex items-center gap-2">
+                <svg className="w-4 h-4 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                  <path
+                    fillRule="evenodd"
+                    d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+                {text}
+              </div>
+            ))}
           </div>
         </motion.div>
       </div>

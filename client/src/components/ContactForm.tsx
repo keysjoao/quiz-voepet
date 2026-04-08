@@ -1,33 +1,44 @@
 /*
- * ContactForm — Captura de contato antes do resultado
- * Design: Consultório Acolhedor — sage green, terracotta, sand
+ * ContactForm — Captura obrigatória de leads (estilo CoreStudio)
+ * Sem opção de pular, seletor de país, ícone de segurança
  */
 
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { ArrowLeft, ArrowRight, Gift, Lock } from 'lucide-react';
+import { ArrowLeft, Lock } from 'lucide-react';
+import type { LeadData } from '@/lib/quizData';
 
 interface ContactFormProps {
   currentStep: number;
   totalSteps: number;
-  onSubmit: (data: { name: string; email: string; whatsapp: string }) => void;
+  onSubmit: (data: LeadData) => void;
   onBack: () => void;
-  onSkip: () => void;
 }
+
+const COUNTRY_CODES = [
+  { code: '+55', flag: '🇧🇷', label: 'Brasil' },
+  { code: '+1', flag: '🇺🇸', label: 'EUA' },
+  { code: '+54', flag: '🇦🇷', label: 'Argentina' },
+  { code: '+351', flag: '🇵🇹', label: 'Portugal' },
+  { code: '+595', flag: '🇵🇾', label: 'Paraguai' },
+  { code: '+598', flag: '🇺🇾', label: 'Uruguai' },
+  { code: '+56', flag: '🇨🇱', label: 'Chile' },
+  { code: '+57', flag: '🇨🇴', label: 'Colômbia' },
+];
 
 export default function ContactForm({
   currentStep,
   totalSteps,
   onSubmit,
   onBack,
-  onSkip,
 }: ContactFormProps) {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [whatsapp, setWhatsapp] = useState('');
+  const [countryCode, setCountryCode] = useState('+55');
   const [errors, setErrors] = useState<Record<string, string>>({});
 
-  const progress = ((currentStep) / totalSteps) * 100;
+  const progress = (currentStep / totalSteps) * 100;
 
   function formatPhone(value: string) {
     const digits = value.replace(/\D/g, '');
@@ -44,13 +55,20 @@ export default function ContactForm({
     if (!name.trim()) newErrors.name = 'Digite seu nome';
     if (!email.trim() || !email.includes('@'))
       newErrors.email = 'Digite um e-mail válido';
+    if (!whatsapp.trim() || whatsapp.replace(/\D/g, '').length < 10)
+      newErrors.whatsapp = 'Digite um WhatsApp válido';
 
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
       return;
     }
 
-    onSubmit({ name: name.trim(), email: email.trim(), whatsapp: whatsapp.trim() });
+    onSubmit({
+      name: name.trim(),
+      email: email.trim(),
+      whatsapp: whatsapp.trim(),
+      countryCode,
+    });
   }
 
   return (
@@ -59,18 +77,14 @@ export default function ContactForm({
       <div className="sticky top-0 z-20 bg-sand-light/80 backdrop-blur-md border-b border-sand/50">
         <div className="max-w-2xl mx-auto w-full px-5 py-4">
           <div className="flex items-center justify-between mb-3">
-            <button
-              onClick={onBack}
-              className="flex items-center gap-1.5 text-sm font-medium text-sage-dark hover:text-sage transition-colors"
-            >
-              <ArrowLeft className="w-4 h-4" />
-              Voltar
-            </button>
-            <span className="text-sm text-muted-foreground font-medium">
+            <span className="text-sm text-muted-foreground">
               Quase lá!
             </span>
+            <span className="text-sm font-semibold text-sage-dark">
+              {Math.round(progress)}%
+            </span>
           </div>
-          <div className="w-full h-2 bg-sand rounded-full overflow-hidden">
+          <div className="w-full h-2.5 bg-sand rounded-full overflow-hidden">
             <motion.div
               className="h-full rounded-full bg-gradient-to-r from-sage to-sage-dark"
               initial={{ width: 0 }}
@@ -88,10 +102,10 @@ export default function ContactForm({
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
         >
-          {/* Gift icon */}
-          <div className="flex justify-center mb-6">
-            <div className="w-16 h-16 rounded-2xl bg-terracotta/10 flex items-center justify-center">
-              <Gift className="w-8 h-8 text-terracotta" />
+          {/* Lock icon */}
+          <div className="flex justify-center mb-5">
+            <div className="w-16 h-16 rounded-full bg-sage/10 flex items-center justify-center">
+              <Lock className="w-8 h-8 text-sage-dark" />
             </div>
           </div>
 
@@ -99,19 +113,18 @@ export default function ContactForm({
             className="text-2xl sm:text-3xl text-warm-dark font-bold text-center leading-snug mb-2"
             style={{ fontFamily: "'DM Serif Display', Georgia, serif" }}
           >
-            Seu resultado está pronto!
+            Deixe seus dados para receber{' '}
+            <span className="text-terracotta">seu diagnóstico</span>
           </h2>
-          <p className="text-muted-foreground text-center text-base mb-8">
-            Deixe seus dados para receber o resultado e uma{' '}
-            <strong className="text-terracotta">surpresa especial</strong> da
-            Dra. Wendi.
+          <p className="text-muted-foreground text-center text-sm mb-8">
+            Seu resultado está pronto! Preencha abaixo para desbloquear.
           </p>
 
           <form onSubmit={handleSubmit} className="flex flex-col gap-4">
             {/* Name */}
             <div>
-              <label className="block text-sm font-medium text-warm-dark mb-1.5">
-                Seu nome
+              <label className="block text-xs font-bold text-warm-dark uppercase tracking-wider mb-1.5">
+                Nome Completo <span className="text-terracotta">*</span>
               </label>
               <input
                 type="text"
@@ -120,7 +133,7 @@ export default function ContactForm({
                   setName(e.target.value);
                   setErrors((prev) => ({ ...prev, name: '' }));
                 }}
-                placeholder="Como podemos te chamar?"
+                placeholder="Seu nome"
                 className={`w-full px-4 py-3.5 rounded-xl border-2 bg-white text-warm-dark placeholder:text-warm-dark/40 transition-all focus:outline-none focus:ring-0 ${
                   errors.name
                     ? 'border-red-400 focus:border-red-400'
@@ -128,14 +141,14 @@ export default function ContactForm({
                 }`}
               />
               {errors.name && (
-                <p className="text-red-500 text-sm mt-1">{errors.name}</p>
+                <p className="text-red-500 text-xs mt-1">{errors.name}</p>
               )}
             </div>
 
             {/* Email */}
             <div>
-              <label className="block text-sm font-medium text-warm-dark mb-1.5">
-                Seu melhor e-mail
+              <label className="block text-xs font-bold text-warm-dark uppercase tracking-wider mb-1.5">
+                Melhor E-mail <span className="text-terracotta">*</span>
               </label>
               <input
                 type="email"
@@ -144,7 +157,7 @@ export default function ContactForm({
                   setEmail(e.target.value);
                   setErrors((prev) => ({ ...prev, email: '' }));
                 }}
-                placeholder="email@exemplo.com"
+                placeholder="seu@email.com"
                 className={`w-full px-4 py-3.5 rounded-xl border-2 bg-white text-warm-dark placeholder:text-warm-dark/40 transition-all focus:outline-none focus:ring-0 ${
                   errors.email
                     ? 'border-red-400 focus:border-red-400'
@@ -152,52 +165,73 @@ export default function ContactForm({
                 }`}
               />
               {errors.email && (
-                <p className="text-red-500 text-sm mt-1">{errors.email}</p>
+                <p className="text-red-500 text-xs mt-1">{errors.email}</p>
               )}
             </div>
 
-            {/* WhatsApp */}
+            {/* WhatsApp with country selector */}
             <div>
-              <label className="block text-sm font-medium text-warm-dark mb-1.5">
-                WhatsApp{' '}
-                <span className="text-muted-foreground font-normal">
-                  (opcional)
-                </span>
+              <label className="block text-xs font-bold text-warm-dark uppercase tracking-wider mb-1.5">
+                WhatsApp <span className="text-terracotta">*</span>
               </label>
-              <input
-                type="tel"
-                value={whatsapp}
-                onChange={(e) => setWhatsapp(formatPhone(e.target.value))}
-                placeholder="(00) 00000-0000"
-                maxLength={16}
-                className="w-full px-4 py-3.5 rounded-xl border-2 border-sand bg-white text-warm-dark placeholder:text-warm-dark/40 transition-all focus:outline-none focus:ring-0 focus:border-sage"
-              />
+              <div className="flex gap-2">
+                <select
+                  value={countryCode}
+                  onChange={(e) => setCountryCode(e.target.value)}
+                  className="w-28 px-2 py-3.5 rounded-xl border-2 border-sand bg-white text-warm-dark text-sm focus:outline-none focus:ring-0 focus:border-sage appearance-none"
+                >
+                  {COUNTRY_CODES.map((c) => (
+                    <option key={c.code} value={c.code}>
+                      {c.flag} {c.code}
+                    </option>
+                  ))}
+                </select>
+                <input
+                  type="tel"
+                  value={whatsapp}
+                  onChange={(e) => {
+                    setWhatsapp(formatPhone(e.target.value));
+                    setErrors((prev) => ({ ...prev, whatsapp: '' }));
+                  }}
+                  placeholder="(00) 00000-0000"
+                  maxLength={16}
+                  className={`flex-1 px-4 py-3.5 rounded-xl border-2 bg-white text-warm-dark placeholder:text-warm-dark/40 transition-all focus:outline-none focus:ring-0 ${
+                    errors.whatsapp
+                      ? 'border-red-400 focus:border-red-400'
+                      : 'border-sand focus:border-sage'
+                  }`}
+                />
+              </div>
+              {errors.whatsapp && (
+                <p className="text-red-500 text-xs mt-1">{errors.whatsapp}</p>
+              )}
             </div>
 
             {/* Submit button */}
             <button
               type="submit"
-              className="group flex items-center justify-center gap-3 w-full px-6 py-4 mt-2 rounded-2xl bg-terracotta text-white font-semibold text-lg shadow-lg shadow-terracotta/25 hover:shadow-xl hover:shadow-terracotta/35 transition-all duration-300 hover:scale-[1.01] active:scale-[0.99]"
+              className="group flex items-center justify-center gap-3 w-full px-6 py-4.5 mt-2 rounded-2xl bg-terracotta text-white font-bold text-base uppercase tracking-wide shadow-lg shadow-terracotta/25 hover:shadow-xl hover:shadow-terracotta/35 transition-all duration-300 hover:scale-[1.01] active:scale-[0.99]"
             >
-              Ver Meu Resultado
-              <ArrowRight className="w-5 h-5 transition-transform group-hover:translate-x-1" />
-            </button>
-
-            {/* Skip link */}
-            <button
-              type="button"
-              onClick={onSkip}
-              className="text-sm text-muted-foreground hover:text-warm-dark transition-colors text-center mt-1"
-            >
-              Pular e ver resultado
+              Receber Diagnóstico
             </button>
 
             {/* Privacy note */}
-            <div className="flex items-center justify-center gap-1.5 text-xs text-muted-foreground mt-2">
+            <div className="flex items-center justify-center gap-1.5 text-xs text-muted-foreground mt-1">
               <Lock className="w-3 h-3" />
-              Seus dados estão seguros. Não enviamos spam.
+              Seus dados são 100% seguros. Não enviamos spam.
             </div>
           </form>
+
+          {/* Back button */}
+          <div className="mt-6 flex justify-center">
+            <button
+              onClick={onBack}
+              className="flex items-center gap-1.5 text-sm font-medium text-sage-dark hover:text-sage transition-colors"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              Voltar
+            </button>
+          </div>
         </motion.div>
       </div>
     </div>

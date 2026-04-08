@@ -1,7 +1,7 @@
 /*
- * Home — Página principal do Quiz Voepet
+ * Home — Página principal do Quiz Voepet (Versão Mesclada)
  * Design: Consultório Acolhedor — sage/terracotta/sand
- * Fluxo: Welcome → Perguntas (1-7) → Contato → Resultado
+ * Fluxo: Welcome → Perguntas (1-8) → Contato obrigatório → Resultado
  */
 
 import { useState, useCallback } from 'react';
@@ -15,6 +15,7 @@ import {
   calculateResult,
   type Category,
   type LeadTemp,
+  type LeadData,
 } from '@/lib/quizData';
 
 type QuizStage = 'welcome' | 'questions' | 'contact' | 'result';
@@ -27,7 +28,8 @@ export default function Home() {
   const [leadTemp, setLeadTemp] = useState<LeadTemp>('morno');
   const [userName, setUserName] = useState('');
 
-  const totalSteps = QUIZ_QUESTIONS.length + 1; // questions + contact form
+  const totalQuestions = QUIZ_QUESTIONS.length;
+  const totalSteps = totalQuestions; // progress bar only counts questions
 
   const handleStart = useCallback(() => {
     setStage('questions');
@@ -63,7 +65,7 @@ export default function Home() {
   }, [stage, currentQuestionIndex]);
 
   const handleContactSubmit = useCallback(
-    (data: { name: string; email: string; whatsapp: string }) => {
+    (data: LeadData) => {
       setUserName(data.name);
       const { category, leadTemp: lt } = calculateResult(answers);
       setResultCategory(category);
@@ -80,13 +82,6 @@ export default function Home() {
     },
     [answers]
   );
-
-  const handleSkipContact = useCallback(() => {
-    const { category, leadTemp: lt } = calculateResult(answers);
-    setResultCategory(category);
-    setLeadTemp(lt);
-    setStage('result');
-  }, [answers]);
 
   const handleRestart = useCallback(() => {
     setStage('welcome');
@@ -118,11 +113,10 @@ export default function Home() {
   if (stage === 'contact') {
     return (
       <ContactForm
-        currentStep={QUIZ_QUESTIONS.length + 1}
+        currentStep={totalQuestions}
         totalSteps={totalSteps}
         onSubmit={handleContactSubmit}
         onBack={handleBack}
-        onSkip={handleSkipContact}
       />
     );
   }

@@ -1,10 +1,10 @@
 /*
- * ResultScreen — Tela de resultado do quiz com recomendação de e-book
- * Design: Consultório Acolhedor — sage green, terracotta, sand
+ * ResultScreen — Tela de resultado mesclada (Voepet + CoreStudio)
+ * Diagnóstico visual, pontos identificados, CTA forte, autoridade
  */
 
 import { motion } from 'framer-motion';
-import { BookOpen, PawPrint, Share2, RotateCcw } from 'lucide-react';
+import { BookOpen, PawPrint, Share2, RotateCcw, CheckCircle2 } from 'lucide-react';
 import type { QuizResult, LeadTemp } from '@/lib/quizData';
 
 interface ResultScreenProps {
@@ -26,7 +26,7 @@ export default function ResultScreen({
     if (navigator.share) {
       navigator.share({
         title: `Sou ${result.title}! — Quiz Voepet`,
-        text: `Fiz o Quiz da Voepet e descobri que sou ${result.title}! Faça o seu também:`,
+        text: `Fiz o Diagnóstico da Voepet e descobri que sou ${result.title}! Faça o seu também:`,
         url: window.location.href,
       });
     } else {
@@ -38,7 +38,7 @@ export default function ResultScreen({
   return (
     <div className="min-h-screen bg-sand-light">
       {/* Hero section with result image */}
-      <div className="relative h-[45vh] sm:h-[50vh] overflow-hidden">
+      <div className="relative h-[40vh] sm:h-[45vh] overflow-hidden">
         <img
           src={result.image}
           alt={result.title}
@@ -65,10 +65,10 @@ export default function ResultScreen({
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.4 }}
-          className="text-center mb-8"
+          className="text-center mb-6"
         >
-          <p className="text-sage-dark font-medium text-sm uppercase tracking-wider mb-2">
-            Seu resultado
+          <p className="text-sage-dark font-bold text-xs uppercase tracking-widest mb-2">
+            Seu Diagnóstico
           </p>
           <h1
             className="text-3xl sm:text-4xl text-warm-dark font-bold mb-4"
@@ -82,19 +82,41 @@ export default function ResultScreen({
           </p>
         </motion.div>
 
+        {/* Diagnostic points card */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.5 }}
+          className="bg-white rounded-2xl border border-sage/20 p-5 mb-6"
+        >
+          <p className="text-sage-dark font-bold text-xs uppercase tracking-widest mb-3">
+            {result.diagnosticTitle}
+          </p>
+          <ul className="flex flex-col gap-2.5">
+            {result.diagnosticPoints.map((point, i) => (
+              <li key={i} className="flex items-start gap-2.5">
+                <CheckCircle2 className="w-5 h-5 text-sage flex-shrink-0 mt-0.5" />
+                <span className="text-warm-dark/80 text-sm leading-relaxed">
+                  {point}
+                </span>
+              </li>
+            ))}
+          </ul>
+        </motion.div>
+
         {/* E-book recommendation card */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.6 }}
-          className="bg-white rounded-3xl border-2 border-sage/20 p-6 sm:p-8 mb-6 shadow-sm"
+          className="bg-white rounded-3xl border-2 border-terracotta/20 p-6 sm:p-8 mb-6 shadow-sm"
         >
           <div className="flex items-center gap-3 mb-4">
-            <div className="w-10 h-10 rounded-xl bg-sage/10 flex items-center justify-center">
-              <BookOpen className="w-5 h-5 text-sage-dark" />
+            <div className="w-10 h-10 rounded-xl bg-terracotta/10 flex items-center justify-center">
+              <BookOpen className="w-5 h-5 text-terracotta" />
             </div>
             <div>
-              <p className="text-xs font-medium text-sage-dark uppercase tracking-wider">
+              <p className="text-xs font-bold text-terracotta uppercase tracking-wider">
                 Recomendação para você
               </p>
             </div>
@@ -129,7 +151,7 @@ export default function ResultScreen({
           {/* CTA Button */}
           <a
             href={result.ctaLink}
-            className="group flex items-center justify-center gap-3 w-full px-6 py-4 rounded-2xl bg-terracotta text-white font-semibold text-lg shadow-lg shadow-terracotta/25 hover:shadow-xl hover:shadow-terracotta/35 transition-all duration-300 hover:scale-[1.01] active:scale-[0.99]"
+            className="group flex items-center justify-center gap-3 w-full px-6 py-4.5 rounded-2xl bg-terracotta text-white font-bold text-base uppercase tracking-wide shadow-lg shadow-terracotta/25 hover:shadow-xl hover:shadow-terracotta/35 transition-all duration-300 hover:scale-[1.01] active:scale-[0.99]"
           >
             {result.ctaText}
           </a>
@@ -142,6 +164,11 @@ export default function ResultScreen({
           {leadTemp === 'morno' && (
             <p className="text-center text-xs text-muted-foreground mt-3">
               Investimento acessível com conteúdo direto ao ponto.
+            </p>
+          )}
+          {leadTemp === 'quente' && (
+            <p className="text-center text-xs text-terracotta/70 font-medium mt-3">
+              Você está pronto para dar o próximo passo!
             </p>
           )}
         </motion.div>

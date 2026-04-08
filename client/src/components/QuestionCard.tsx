@@ -1,11 +1,12 @@
 /*
- * QuestionCard — Exibe uma pergunta do quiz com opções
- * Design: Consultório Acolhedor — cards suaves, transições orgânicas
+ * QuestionCard — Mesclado Voepet + CoreStudio
+ * Badges de categoria, emojis, layout cards/list, percentual de progresso
  */
 
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowLeft } from 'lucide-react';
 import type { QuizQuestion } from '@/lib/quizData';
+import { BADGE_CONFIG } from '@/lib/quizData';
 
 interface QuestionCardProps {
   question: QuizQuestion;
@@ -26,7 +27,10 @@ export default function QuestionCard({
   onBack,
   canGoBack,
 }: QuestionCardProps) {
-  const progress = ((currentStep) / totalSteps) * 100;
+  const progress = (currentStep / totalSteps) * 100;
+  const percentText = `${Math.round(progress)}%`;
+  const badge = BADGE_CONFIG[question.badge];
+  const questionNumber = String(currentStep).padStart(2, '0');
 
   return (
     <div className="min-h-screen flex flex-col bg-sand-light">
@@ -34,25 +38,16 @@ export default function QuestionCard({
       <div className="sticky top-0 z-20 bg-sand-light/80 backdrop-blur-md border-b border-sand/50">
         <div className="max-w-2xl mx-auto w-full px-5 py-4">
           <div className="flex items-center justify-between mb-3">
-            <button
-              onClick={onBack}
-              disabled={!canGoBack}
-              className={`flex items-center gap-1.5 text-sm font-medium transition-colors ${
-                canGoBack
-                  ? 'text-sage-dark hover:text-sage'
-                  : 'text-transparent pointer-events-none'
-              }`}
-            >
-              <ArrowLeft className="w-4 h-4" />
-              Voltar
-            </button>
-            <span className="text-sm text-muted-foreground font-medium">
-              {currentStep} de {totalSteps}
+            <span className="text-sm text-muted-foreground">
+              Pergunta {currentStep} de {totalSteps}
+            </span>
+            <span className="text-sm font-semibold text-sage-dark">
+              {percentText}
             </span>
           </div>
 
           {/* Progress bar */}
-          <div className="w-full h-2 bg-sand rounded-full overflow-hidden">
+          <div className="w-full h-2.5 bg-sand rounded-full overflow-hidden">
             <motion.div
               className="h-full rounded-full bg-gradient-to-r from-sage to-sage-dark"
               initial={{ width: 0 }}
@@ -64,7 +59,7 @@ export default function QuestionCard({
       </div>
 
       {/* Question content */}
-      <div className="flex-1 flex flex-col justify-center max-w-2xl mx-auto w-full px-5 py-8">
+      <div className="flex-1 flex flex-col max-w-2xl mx-auto w-full px-5 py-6">
         <AnimatePresence mode="wait">
           <motion.div
             key={question.id}
@@ -72,9 +67,26 @@ export default function QuestionCard({
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -40 }}
             transition={{ duration: 0.35, ease: 'easeOut' }}
+            className="flex-1 flex flex-col"
           >
-            {/* Question text */}
-            <div className="mb-8">
+            {/* Badge */}
+            <div className="mb-4">
+              <span
+                className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider border ${badge.color}`}
+              >
+                <span className="w-1.5 h-1.5 rounded-full bg-current" />
+                {badge.label}
+              </span>
+            </div>
+
+            {/* Question card */}
+            <div className="bg-white rounded-3xl border border-sand/80 shadow-sm p-6 sm:p-8 mb-4 flex-1">
+              {/* Question number */}
+              <p className="text-sage-dark text-xs font-bold uppercase tracking-widest mb-3">
+                Pergunta {questionNumber}
+              </p>
+
+              {/* Question text */}
               <h2
                 className="text-2xl sm:text-3xl text-warm-dark font-bold leading-snug mb-2"
                 style={{ fontFamily: "'DM Serif Display', Georgia, serif" }}
@@ -82,70 +94,99 @@ export default function QuestionCard({
                 {question.question}
               </h2>
               {question.subtitle && (
-                <p className="text-muted-foreground text-base">
+                <p className="text-muted-foreground text-sm mb-6 italic">
                   {question.subtitle}
                 </p>
               )}
+
+              {/* Options — cards layout */}
+              {question.layout === 'cards' ? (
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                  {question.options.map((option, index) => {
+                    const isSelected = selectedAnswer === option.id;
+                    return (
+                      <motion.button
+                        key={option.id}
+                        initial={{ opacity: 0, y: 15 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.3, delay: index * 0.06 }}
+                        onClick={() => onSelect(option.id)}
+                        className={`group relative flex flex-col items-center text-center p-4 rounded-2xl border-2 transition-all duration-300 ${
+                          isSelected
+                            ? 'border-sage bg-sage/10 shadow-md shadow-sage/10'
+                            : 'border-sand/80 bg-sand-light hover:border-sage/40 hover:bg-sage/5 hover:shadow-sm'
+                        }`}
+                      >
+                        <span className="text-3xl mb-2.5">{option.emoji}</span>
+                        <span
+                          className={`text-sm leading-snug transition-colors ${
+                            isSelected
+                              ? 'text-warm-dark font-semibold'
+                              : 'text-warm-dark/75 group-hover:text-warm-dark'
+                          }`}
+                        >
+                          {option.text}
+                        </span>
+                      </motion.button>
+                    );
+                  })}
+                </div>
+              ) : (
+                /* Options — list layout */
+                <div className="flex flex-col gap-3">
+                  {question.options.map((option, index) => {
+                    const isSelected = selectedAnswer === option.id;
+                    return (
+                      <motion.button
+                        key={option.id}
+                        initial={{ opacity: 0, y: 15 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.3, delay: index * 0.06 }}
+                        onClick={() => onSelect(option.id)}
+                        className={`group relative w-full text-left px-5 py-4 rounded-2xl border-2 transition-all duration-300 ${
+                          isSelected
+                            ? 'border-sage bg-sage/10 shadow-md shadow-sage/10'
+                            : 'border-sand/80 bg-white hover:border-sage/40 hover:bg-sage/5 hover:shadow-sm'
+                        }`}
+                      >
+                        <div className="flex items-start gap-3.5">
+                          <span className="text-xl flex-shrink-0 mt-0.5">
+                            {option.emoji}
+                          </span>
+                          <span
+                            className={`text-base leading-relaxed transition-colors ${
+                              isSelected
+                                ? 'text-warm-dark font-medium'
+                                : 'text-warm-dark/80 group-hover:text-warm-dark'
+                            }`}
+                          >
+                            {option.text}
+                          </span>
+                        </div>
+                      </motion.button>
+                    );
+                  })}
+                </div>
+              )}
             </div>
 
-            {/* Options */}
-            <div className="flex flex-col gap-3">
-              {question.options.map((option, index) => {
-                const isSelected = selectedAnswer === option.id;
-                return (
-                  <motion.button
-                    key={option.id}
-                    initial={{ opacity: 0, y: 15 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.3, delay: index * 0.06 }}
-                    onClick={() => onSelect(option.id)}
-                    className={`group relative w-full text-left px-5 py-4 rounded-2xl border-2 transition-all duration-300 ${
-                      isSelected
-                        ? 'border-sage bg-sage/10 shadow-md shadow-sage/10'
-                        : 'border-sand bg-white hover:border-sage/40 hover:bg-sage/5 hover:shadow-sm'
-                    }`}
-                  >
-                    <div className="flex items-start gap-4">
-                      {/* Radio indicator */}
-                      <div
-                        className={`mt-0.5 w-5 h-5 rounded-full border-2 flex-shrink-0 flex items-center justify-center transition-all duration-300 ${
-                          isSelected
-                            ? 'border-sage bg-sage'
-                            : 'border-sand group-hover:border-sage/50'
-                        }`}
-                      >
-                        {isSelected && (
-                          <motion.div
-                            initial={{ scale: 0 }}
-                            animate={{ scale: 1 }}
-                            className="w-2 h-2 rounded-full bg-white"
-                          />
-                        )}
-                      </div>
-
-                      <span
-                        className={`text-base leading-relaxed transition-colors ${
-                          isSelected
-                            ? 'text-warm-dark font-medium'
-                            : 'text-warm-dark/80 group-hover:text-warm-dark'
-                        }`}
-                      >
-                        {option.text}
-                      </span>
-                    </div>
-                  </motion.button>
-                );
-              })}
+            {/* Back button */}
+            <div className="pt-2">
+              <button
+                onClick={onBack}
+                disabled={!canGoBack}
+                className={`flex items-center gap-1.5 text-sm font-medium transition-colors ${
+                  canGoBack
+                    ? 'text-sage-dark hover:text-sage'
+                    : 'text-transparent pointer-events-none'
+                }`}
+              >
+                <ArrowLeft className="w-4 h-4" />
+                Voltar
+              </button>
             </div>
           </motion.div>
         </AnimatePresence>
-      </div>
-
-      {/* Decorative paw prints */}
-      <div className="fixed bottom-4 right-4 opacity-[0.04] pointer-events-none">
-        <svg width="120" height="120" viewBox="0 0 24 24" fill="currentColor" className="text-sage-dark">
-          <path d="M12 10c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-4.5-2c-.83 0-1.5.67-1.5 1.5S6.67 11 7.5 11 9 10.33 9 9.5 8.33 8 7.5 8zm9 0c-.83 0-1.5.67-1.5 1.5s.67 1.5 1.5 1.5 1.5-.67 1.5-1.5S17.33 8 16.5 8zM12 16c-1.65 0-3 1.35-3 3s1.35 3 3 3 3-1.35 3-3-1.35-3-3-3zm-4-9c-.83 0-1.5.67-1.5 1.5S7.17 10 8 10s1.5-.67 1.5-1.5S8.83 7 8 7zm8 0c-.83 0-1.5.67-1.5 1.5S15.17 10 16 10s1.5-.67 1.5-1.5S16.83 7 16 7z" />
-        </svg>
       </div>
     </div>
   );
