@@ -1,134 +1,174 @@
 /*
- * Home — Página principal do Quiz Voepet (Versão Mesclada)
- * Design: Consultório Acolhedor — sage/terracotta/sand
- * Fluxo: Welcome → Perguntas (1-8) → Contato obrigatório → Resultado
+ * Home — Quiz Voepet com ramificação para dois públicos
+ * Profissionais → Mentoria Vet Sem Fronteiras
+ * Tutores → E-books
  */
 
 import { useState, useCallback } from 'react';
+import {
+  QUIZ_QUESTIONS,
+  getQuestionsForAudience,
+  TUTOR_RESULTS,
+  PRO_RESULTS,
+  calculateTutorResult,
+  calculateProResult,
+} from '@/lib/quizData';
+import type {
+  Audience,
+  QuizResult,
+  LeadTemp,
+  LeadData,
+} from '@/lib/quizData';
 import WelcomeScreen from '@/components/WelcomeScreen';
 import QuestionCard from '@/components/QuestionCard';
 import ContactForm from '@/components/ContactForm';
 import ResultScreen from '@/components/ResultScreen';
-import {
-  QUIZ_QUESTIONS,
-  QUIZ_RESULTS,
-  calculateResult,
-  type Category,
-  type LeadTemp,
-  type LeadData,
-} from '@/lib/quizData';
 
-type QuizStage = 'welcome' | 'questions' | 'contact' | 'result';
+type Phase = 'welcome' | 'quiz' | 'contact' | 'result';
 
 export default function Home() {
-  const [stage, setStage] = useState<QuizStage>('welcome');
-  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-  const [answers, setAnswers] = useState<Record<number, string>>({});
-  const [resultCategory, setResultCategory] = useState<Category>('transporte');
+  const [phase, setPhase] = useState<Phase>('welcome');
+  const [audience, setAudience] = useState<Audience | null>(null);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [answers, setAnswers] = useState<Record<string, string>>({});
+  const [result, setResult] = useState<QuizResult | null>(null);
   const [leadTemp, setLeadTemp] = useState<LeadTemp>('morno');
   const [userName, setUserName] = useState('');
 
-  const totalQuestions = QUIZ_QUESTIONS.length;
-  const totalSteps = totalQuestions; // progress bar only counts questions
+  // Get the active question list based on audience
+  const questions = audience ? getQuestionsForAudience(audience) : [QUIZ_QUESTIONS[0]];
+  const currentQuestion = questions[currentIndex];
+  const totalSteps = audience ? questions.length : 1;
 
   const handleStart = useCallback(() => {
-    setStage('questions');
-    setCurrentQuestionIndex(0);
+    setPhase('quiz');
+    setCurrentIndex(0);
+    setAnswers({});
+    setAudience(null);
   }, []);
 
-  const handleSelectAnswer = useCallback(
+  const handleSelect = useCallback(
     (optionId: string) => {
-      const question = QUIZ_QUESTIONS[currentQuestionIndex];
-      setAnswers((prev) => ({ ...prev, [question.id]: optionId }));
+      const q = questions[currentIndex];
+      const option = q.options.find((o) => o.id === optionId);
+      if (!option) return;
 
-      // Auto-advance after a short delay
+      const newAnswers = { ...answers, [q.id]: optionId };
+      setAnswers(newAnswers);
+
+      // If this is the first question (audience selector)
+      if (q.id === 'q1' && option.audience) {
+        setAudience(option.audience);
+        // After setting audience, the questions list will change
+        // Move to index 1 (second question in the audience-specific list)
+        setTimeout(() => setCurrentIndex(1), 400);
+        return;
+      }
+
+      // Auto-advance after selection
       setTimeout(() => {
-        if (currentQuestionIndex < QUIZ_QUESTIONS.length - 1) {
-          setCurrentQuestionIndex((prev) => prev + 1);
+        if (currentIndex < totalSteps - 1) {
+          setCurrentIndex((prev) => prev + 1);
         } else {
-          setStage('contact');
+          // Quiz finished → go to contact form
+          setPhase('contact');
         }
-      }, 350);
+      }, 400);
     },
-    [currentQuestionIndex]
+    [answers, currentIndex, questions, totalSteps]
   );
 
   const handleBack = useCallback(() => {
-    if (stage === 'contact') {
-      setStage('questions');
-      setCurrentQuestionIndex(QUIZ_QUESTIONS.length - 1);
-    } else if (currentQuestionIndex > 0) {
-      setCurrentQuestionIndex((prev) => prev - 1);
-    } else {
-      setStage('welcome');
+    if (currentIndex > 0) {
+      // If going back to question 1, reset audience
+      if (currentIndex === 1) {
+        setAudience(null);
+        setCurrentIndex(0);
+        return;
+      }
+      setCurrentIndex((prev) => prev - 1);
     }
-  }, [stage, currentQuestionIndex]);
+  }, [currentIndex]);
 
   const handleContactSubmit = useCallback(
     (data: LeadData) => {
-      setUserName(data.name);
-      const { category, leadTemp: lt } = calculateResult(answers);
-      setResultCategory(category);
-      setLeadTemp(lt);
-      setStage('result');
+      setUserName(data.name.split(' ')[0]);
 
-      // Log lead data (in production, send to backend/CRM)
-      console.log('Lead captured:', {
-        ...data,
-        category,
-        leadTemp: lt,
-        answers,
-      });
+      if (audience === 'tutor') {
+        const { category, leadTemp: lt } = calculateTutorResult(answers);
+        setResult(TUTOR_RESULTS[category]);
+        setLeadTemp(lt);
+      } else if (audience === 'profissional') {
+        const { category, leadTemp: lt } = calculateProResult(answers);
+        setResult(PRO_RESULTS[category]);
+        setLeadTemp(lt);
+      }
+
+      setPhase('result');
     },
-    [answers]
+    [answers, audience]
   );
 
+  const handleContactBack = useCallback(() => {
+    setPhase('quiz');
+    // Go back to last question
+    if (audience) {
+      const qs = getQuestionsForAudience(audience);
+      setCurrentIndex(qs.length - 1);
+    }
+  }, [audience]);
+
   const handleRestart = useCallback(() => {
-    setStage('welcome');
-    setCurrentQuestionIndex(0);
+    setPhase('welcome');
+    setAudience(null);
+    setCurrentIndex(0);
     setAnswers({});
+    setResult(null);
+    setLeadTemp('morno');
     setUserName('');
-    window.scrollTo(0, 0);
   }, []);
 
-  if (stage === 'welcome') {
+  if (phase === 'welcome') {
     return <WelcomeScreen onStart={handleStart} />;
   }
 
-  if (stage === 'questions') {
-    const question = QUIZ_QUESTIONS[currentQuestionIndex];
+  if (phase === 'quiz' && currentQuestion) {
     return (
       <QuestionCard
-        question={question}
-        currentStep={currentQuestionIndex + 1}
+        question={currentQuestion}
+        currentStep={currentIndex + 1}
         totalSteps={totalSteps}
-        selectedAnswer={answers[question.id]}
-        onSelect={handleSelectAnswer}
+        selectedAnswer={answers[currentQuestion.id]}
+        onSelect={handleSelect}
         onBack={handleBack}
-        canGoBack={true}
+        canGoBack={currentIndex > 0}
       />
     );
   }
 
-  if (stage === 'contact') {
+  if (phase === 'contact') {
     return (
       <ContactForm
-        currentStep={totalQuestions}
-        totalSteps={totalSteps}
+        currentStep={totalSteps + 1}
+        totalSteps={totalSteps + 1}
         onSubmit={handleContactSubmit}
-        onBack={handleBack}
+        onBack={handleContactBack}
+        audience={audience}
       />
     );
   }
 
-  // Result stage
-  const result = QUIZ_RESULTS[resultCategory];
-  return (
-    <ResultScreen
-      result={result}
-      leadTemp={leadTemp}
-      userName={userName}
-      onRestart={handleRestart}
-    />
-  );
+  if (phase === 'result' && result) {
+    return (
+      <ResultScreen
+        result={result}
+        leadTemp={leadTemp}
+        userName={userName}
+        audience={audience!}
+        onRestart={handleRestart}
+      />
+    );
+  }
+
+  return null;
 }

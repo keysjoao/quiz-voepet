@@ -1,18 +1,20 @@
 /*
- * ContactForm — Captura obrigatória de leads (estilo CoreStudio)
- * Sem opção de pular, seletor de país, ícone de segurança
+ * ContactForm — Captura obrigatória de leads com texto adaptado por público
+ * Profissionais: "Agendar seu diagnóstico gratuito"
+ * Tutores: "Receber seu diagnóstico"
  */
 
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { ArrowLeft, Lock } from 'lucide-react';
-import type { LeadData } from '@/lib/quizData';
+import type { LeadData, Audience } from '@/lib/quizData';
 
 interface ContactFormProps {
   currentStep: number;
   totalSteps: number;
   onSubmit: (data: LeadData) => void;
   onBack: () => void;
+  audience: Audience | null;
 }
 
 const COUNTRY_CODES = [
@@ -31,6 +33,7 @@ export default function ContactForm({
   totalSteps,
   onSubmit,
   onBack,
+  audience,
 }: ContactFormProps) {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -39,6 +42,7 @@ export default function ContactForm({
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   const progress = (currentStep / totalSteps) * 100;
+  const isPro = audience === 'profissional';
 
   function formatPhone(value: string) {
     const digits = value.replace(/\D/g, '');
@@ -104,8 +108,8 @@ export default function ContactForm({
         >
           {/* Lock icon */}
           <div className="flex justify-center mb-5">
-            <div className="w-16 h-16 rounded-full bg-sage/10 flex items-center justify-center">
-              <Lock className="w-8 h-8 text-sage-dark" />
+            <div className={`w-16 h-16 rounded-full flex items-center justify-center ${isPro ? 'bg-sky-100' : 'bg-sage/10'}`}>
+              <Lock className={`w-8 h-8 ${isPro ? 'text-sky-700' : 'text-sage-dark'}`} />
             </div>
           </div>
 
@@ -113,11 +117,22 @@ export default function ContactForm({
             className="text-2xl sm:text-3xl text-warm-dark font-bold text-center leading-snug mb-2"
             style={{ fontFamily: "'DM Serif Display', Georgia, serif" }}
           >
-            Deixe seus dados para receber{' '}
-            <span className="text-terracotta">seu diagnóstico</span>
+            {isPro ? (
+              <>
+                Deixe seus dados para agendar{' '}
+                <span className="text-sky-700">seu diagnóstico gratuito</span>
+              </>
+            ) : (
+              <>
+                Deixe seus dados para receber{' '}
+                <span className="text-terracotta">seu diagnóstico</span>
+              </>
+            )}
           </h2>
           <p className="text-muted-foreground text-center text-sm mb-8">
-            Seu resultado está pronto! Preencha abaixo para desbloquear.
+            {isPro
+              ? 'Seu resultado está pronto! Nossa equipe entrará em contato para agendar sua sessão de diagnóstico gratuita.'
+              : 'Seu resultado está pronto! Preencha abaixo para desbloquear.'}
           </p>
 
           <form onSubmit={handleSubmit} className="flex flex-col gap-4">
@@ -210,9 +225,13 @@ export default function ContactForm({
             {/* Submit button */}
             <button
               type="submit"
-              className="group flex items-center justify-center gap-3 w-full px-6 py-4.5 mt-2 rounded-2xl bg-terracotta text-white font-bold text-base uppercase tracking-wide shadow-lg shadow-terracotta/25 hover:shadow-xl hover:shadow-terracotta/35 transition-all duration-300 hover:scale-[1.01] active:scale-[0.99]"
+              className={`group flex items-center justify-center gap-3 w-full px-6 py-4.5 mt-2 rounded-2xl text-white font-bold text-base uppercase tracking-wide shadow-lg transition-all duration-300 hover:scale-[1.01] active:scale-[0.99] ${
+                isPro
+                  ? 'bg-sky-700 shadow-sky-700/25 hover:shadow-xl hover:shadow-sky-700/35'
+                  : 'bg-terracotta shadow-terracotta/25 hover:shadow-xl hover:shadow-terracotta/35'
+              }`}
             >
-              Receber Diagnóstico
+              {isPro ? 'Agendar Diagnóstico Gratuito' : 'Receber Diagnóstico'}
             </button>
 
             {/* Privacy note */}

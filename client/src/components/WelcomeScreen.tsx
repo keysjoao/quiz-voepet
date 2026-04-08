@@ -1,5 +1,5 @@
 /*
- * WelcomeScreen — Tela de boas-vindas mesclada (Voepet + CoreStudio)
+ * WelcomeScreen — Tela de boas-vindas para ambos os públicos
  * Hero com imagem + stats cards + CTA forte + linguagem de diagnóstico
  */
 
@@ -54,18 +54,18 @@ export default function WelcomeScreen({ onStart }: WelcomeScreenProps) {
               className="text-4xl sm:text-5xl lg:text-6xl text-white font-bold leading-tight mb-5"
               style={{ fontFamily: "'DM Serif Display', Georgia, serif" }}
             >
-              Descubra o que seu pet
+              Descubra seu próximo
               <br />
-              <span className="text-terracotta-light">mais precisa</span>
+              <span className="text-terracotta-light">passo no mundo pet</span>
             </h1>
 
             <p className="text-white/85 text-lg sm:text-xl leading-relaxed mb-8 max-w-lg">
-              Este diagnóstico rápido vai revelar a maior necessidade do seu pet e qual o próximo passo para cuidar dele com mais segurança. Feito pela{' '}
-              <strong className="text-white">Dra. Wendi</strong>, veterinária há mais de 20 anos.
+              Seja você <strong className="text-white">tutor de pet</strong>, <strong className="text-white">veterinário(a)</strong> ou <strong className="text-white">empresário(a)</strong> do setor — este diagnóstico rápido vai revelar o caminho certo para você. Feito pela{' '}
+              <strong className="text-white">Dra. Wendi</strong>, veterinária e empresária há mais de 20 anos.
             </p>
           </motion.div>
 
-          {/* Stats cards — inspirado no CoreStudio */}
+          {/* Stats cards */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -73,7 +73,7 @@ export default function WelcomeScreen({ onStart }: WelcomeScreenProps) {
             className="flex gap-3 mb-8"
           >
             {[
-              { value: '8', label: 'perguntas\nrápidas' },
+              { value: '6-7', label: 'perguntas\npersonalizadas' },
               { value: '~2 min', label: 'tempo\nestimado' },
               { value: '100%', label: 'gratuito\ne sigiloso' },
             ].map((stat, i) => (
@@ -110,7 +110,7 @@ export default function WelcomeScreen({ onStart }: WelcomeScreenProps) {
             </button>
 
             <p className="text-white/55 text-sm mt-3 text-center w-full sm:w-auto sm:text-left">
-              8 perguntas · Resultado imediato
+              Para tutores, veterinários e empresários
             </p>
           </motion.div>
         </div>
