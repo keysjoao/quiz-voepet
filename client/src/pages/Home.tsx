@@ -94,14 +94,58 @@ export default function Home() {
     (data: LeadData) => {
       setUserName(data.name.split(' ')[0]);
 
+      let resolvedResult: QuizResult | null = null;
+      let resolvedLeadTemp: LeadTemp = 'morno';
+      let resolvedCategory: string | null = null;
+
       if (audience === 'tutor') {
         const { category, leadTemp: lt } = calculateTutorResult(answers);
-        setResult(TUTOR_RESULTS[category]);
+        resolvedResult = TUTOR_RESULTS[category];
+        resolvedLeadTemp = lt;
+        resolvedCategory = category;
+        setResult(resolvedResult);
         setLeadTemp(lt);
       } else if (audience === 'profissional') {
         const { category, leadTemp: lt } = calculateProResult(answers);
-        setResult(PRO_RESULTS[category]);
+        resolvedResult = PRO_RESULTS[category];
+        resolvedLeadTemp = lt;
+        resolvedCategory = category;
+        setResult(resolvedResult);
         setLeadTemp(lt);
+      }
+
+      // If embedded in an iframe (e.g. core-sales /p route), hand the lead
+      // off to the parent so it can persist to cs_leads. The parent validates
+      // origin, so this is safe to broadcast with '*'.
+      if (typeof window !== 'undefined' && window.parent !== window) {
+        const audienceQuestions = audience ? getQuestionsForAudience(audience) : QUIZ_QUESTIONS;
+        const labeledAnswers: Record<string, string> = {};
+        for (const [qId, optId] of Object.entries(answers)) {
+          const q = audienceQuestions.find((question) => question.id === qId)
+            || QUIZ_QUESTIONS.find((question) => question.id === qId);
+          const opt = q?.options.find((o) => o.id === optId);
+          if (q && opt) labeledAnswers[q.question] = opt.text;
+        }
+
+        window.parent.postMessage(
+          {
+            type: 'quiz-lead',
+            payload: {
+              name: data.name,
+              email: data.email,
+              whatsapp: data.whatsapp,
+              countryCode: data.countryCode,
+              audience,
+              answers,
+              answersLabeled: labeledAnswers,
+              outcomeId: resolvedCategory,
+              outcomeTitle: resolvedResult?.title || null,
+              leadTemp: resolvedLeadTemp,
+              isQualified: resolvedLeadTemp === 'quente',
+            },
+          },
+          '*'
+        );
       }
 
       setPhase('result');
