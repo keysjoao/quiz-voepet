@@ -229,6 +229,8 @@ export default function ResultScreen({
           {/* CTA Button */}
           <a
             href={result.ctaLink}
+            target="_top"
+            rel="noopener noreferrer"
             className={`group flex items-center justify-center gap-3 w-full px-6 py-4.5 rounded-2xl text-white font-bold text-base uppercase tracking-wide shadow-lg transition-all duration-300 hover:scale-[1.01] active:scale-[0.99] ${
               isPro
                 ? 'bg-sky-700 shadow-sky-700/25 hover:shadow-xl hover:shadow-sky-700/35'

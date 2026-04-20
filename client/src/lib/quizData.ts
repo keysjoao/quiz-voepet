@@ -545,7 +545,7 @@ export const TUTOR_RESULTS: Record<PetCategory, QuizResult> = {
     offerDescription:
       'Tudo o que você precisa saber sobre documentação, caixas de transporte, companhias aéreas, sedação, e como preparar seu pet para viajar sem estresse. Escrito pela Dra. Wendi, que transporta animais profissionalmente há anos.',
     ctaText: 'Quero Meu Guia de Transporte!',
-    ctaLink: '#',
+    ctaLink: 'https://vitrine.voepet.com/p/checkout/hb3jt9q7oy',
     image:
       'https://d2xsxph8kpxj0f.cloudfront.net/310519663458931464/5XPcGj2vraE3wVcMMnDzBN/resultado-transporte-dRTC2dUrFRixhCPAiJ7DEV.webp',
     color: 'sage',
@@ -568,7 +568,7 @@ export const TUTOR_RESULTS: Record<PetCategory, QuizResult> = {
     offerDescription:
       'Um guia prático para decodificar os sinais do seu pet: por que ele late, destrói, tem medo ou fica ansioso. Com orientações da Dra. Wendi para melhorar a convivência e o bem-estar do seu companheiro.',
     ctaText: 'Quero Entender Meu Pet!',
-    ctaLink: '#',
+    ctaLink: 'https://vitrine.voepet.com/p/checkout/zulnfzebss',
     image:
       'https://d2xsxph8kpxj0f.cloudfront.net/310519663458931464/5XPcGj2vraE3wVcMMnDzBN/resultado-comportamento-MefPMBRniqThGz88VHTPgy.webp',
     color: 'terracotta',
@@ -591,7 +591,7 @@ export const TUTOR_RESULTS: Record<PetCategory, QuizResult> = {
     offerDescription:
       'Aprenda a identificar os sinais sutis de dor no seu cão ou gato, saiba quando procurar o veterinário e o que fazer em casa. Conteúdo baseado em mais de 20 anos de experiência clínica da Dra. Wendi.',
     ctaText: 'Quero Proteger Meu Pet!',
-    ctaLink: '#',
+    ctaLink: 'https://vitrine.voepet.com/p/checkout/aeu3pbsw3x',
     image:
       'https://d2xsxph8kpxj0f.cloudfront.net/310519663458931464/5XPcGj2vraE3wVcMMnDzBN/resultado-saude-ViKVYZUey8DDCv46KciA5S.webp',
     color: 'sage',
@@ -614,7 +614,7 @@ export const TUTOR_RESULTS: Record<PetCategory, QuizResult> = {
     offerDescription:
       'Entenda os tipos de alergia, como identificar gatilhos, tratamentos eficazes e cuidados diários para aliviar o sofrimento do seu pet. Orientações práticas da Dra. Wendi, veterinária especialista.',
     ctaText: 'Quero Aliviar Meu Pet!',
-    ctaLink: '#',
+    ctaLink: 'https://vitrine.voepet.com/p/checkout/9jnwgxpfht',
     image:
       'https://d2xsxph8kpxj0f.cloudfront.net/310519663458931464/5XPcGj2vraE3wVcMMnDzBN/resultado-alergia-3Mh9hyYFSdZZbhvkExRrdv.webp',
     color: 'terracotta',
@@ -637,7 +637,7 @@ export const TUTOR_RESULTS: Record<PetCategory, QuizResult> = {
     offerDescription:
       'Ração, alimentação natural ou mista? Saiba como escolher a melhor opção para o seu pet, quais alimentos evitar e como montar um plano alimentar equilibrado. Pela Dra. Wendi, com base em ciência e prática.',
     ctaText: 'Quero Alimentar Melhor!',
-    ctaLink: '#',
+    ctaLink: 'https://vitrine.voepet.com/p/checkout/fjzkj1d2xm',
     image:
       'https://d2xsxph8kpxj0f.cloudfront.net/310519663458931464/5XPcGj2vraE3wVcMMnDzBN/resultado-nutricional-eNCEPabwGuXwJ6WwjCTueu.webp',
     color: 'sage',
@@ -664,7 +664,7 @@ export const PRO_RESULTS: Record<ProCategory, QuizResult> = {
     offerDescription:
       'Programa de alto valor com a Dra. Wendi para transformar sua mentalidade de "salvador de pets" para empresário de alto faturamento. Inclui: Mentalidade e Gestão, Precificação Lucrativa, Vendas e Posicionamento + Bônus exclusivo: O Método Voepet (transporte de animais) e Assessoria na Prática para viagens internacionais.',
     ctaText: 'Agendar Meu Diagnóstico Gratuito',
-    ctaLink: '#',
+    ctaLink: 'https://wa.me/5541987358981/?text=Eu%20vim%20do%20Quiz%20e%20quero%20saber%20mais',
     image:
       'https://d2xsxph8kpxj0f.cloudfront.net/310519663458931464/5XPcGj2vraE3wVcMMnDzBN/hero-quiz-voepet-QNtJZRmD8kN9kKqaxvJEJ8.webp',
     color: 'teal',
@@ -688,7 +688,7 @@ export const PRO_RESULTS: Record<ProCategory, QuizResult> = {
     offerDescription:
       'Saia da estagnação com acompanhamento direto da Dra. Wendi. O programa inclui Precificação Lucrativa (calcular custos reais e definir margens), Vendas e Posicionamento nas redes sociais, e o bônus exclusivo do Método Voepet para monetizar com transporte de animais.',
     ctaText: 'Agendar Meu Diagnóstico Gratuito',
-    ctaLink: '#',
+    ctaLink: 'https://wa.me/5541987358981/?text=Eu%20vim%20do%20Quiz%20e%20quero%20saber%20mais',
     image:
       'https://d2xsxph8kpxj0f.cloudfront.net/310519663458931464/5XPcGj2vraE3wVcMMnDzBN/hero-quiz-voepet-QNtJZRmD8kN9kKqaxvJEJ8.webp',
     color: 'teal',
@@ -712,7 +712,7 @@ export const PRO_RESULTS: Record<ProCategory, QuizResult> = {
     offerDescription:
       'Comece com o pé direito. A Dra. Wendi criou um programa completo: Mentalidade e Gestão, Precificação Lucrativa, Vendas e Posicionamento, mais os bônus exclusivos do Método Voepet e Assessoria na Prática (microchipagem, sorologia, CVI, caixas de transporte). Do zero ao faturamento.',
     ctaText: 'Agendar Meu Diagnóstico Gratuito',
-    ctaLink: '#',
+    ctaLink: 'https://wa.me/5541987358981/?text=Eu%20vim%20do%20Quiz%20e%20quero%20saber%20mais',
     image:
       'https://d2xsxph8kpxj0f.cloudfront.net/310519663458931464/5XPcGj2vraE3wVcMMnDzBN/hero-quiz-voepet-QNtJZRmD8kN9kKqaxvJEJ8.webp',
     color: 'teal',
